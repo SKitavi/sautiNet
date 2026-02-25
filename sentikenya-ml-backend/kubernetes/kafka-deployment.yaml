@@ -1,0 +1,221 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sentikenya
+
+---
+# ══════════════════════════════════════════════════════
+# Zookeeper
+# ══════════════════════════════════════════════════════
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+  namespace: sentikenya
+  labels:
+    app: sentikenya
+    component: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentikenya
+      component: zookeeper
+  template:
+    metadata:
+      labels:
+        app: sentikenya
+        component: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: confluentinc/cp-zookeeper:7.5.0
+          ports:
+            - containerPort: 2181
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "2181"
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            tcpSocket:
+              port: 2181
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 2181
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-svc
+  namespace: sentikenya
+spec:
+  selector:
+    app: sentikenya
+    component: zookeeper
+  ports:
+    - port: 2181
+      targetPort: 2181
+
+---
+# ══════════════════════════════════════════════════════
+# Kafka Broker
+# ══════════════════════════════════════════════════════
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+  namespace: sentikenya
+  labels:
+    app: sentikenya
+    component: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentikenya
+      component: kafka
+  template:
+    metadata:
+      labels:
+        app: sentikenya
+        component: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: confluentinc/cp-kafka:7.5.0
+          ports:
+            - containerPort: 9092
+              name: external
+            - containerPort: 29092
+              name: internal
+          env:
+            - name: KAFKA_BROKER_ID
+              value: "1"
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: "zookeeper-svc:2181"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "INTERNAL://kafka-svc:29092,EXTERNAL://localhost:9092"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: "INTERNAL"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+              value: "true"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          livenessProbe:
+            exec:
+              command:
+                - kafka-broker-api-versions
+                - --bootstrap-server
+                - localhost:9092
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - kafka-broker-api-versions
+                - --bootstrap-server
+                - localhost:9092
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-svc
+  namespace: sentikenya
+  labels:
+    app: sentikenya
+    component: kafka
+spec:
+  selector:
+    app: sentikenya
+    component: kafka
+  ports:
+    - port: 9092
+      targetPort: 9092
+      name: external
+    - port: 29092
+      targetPort: 29092
+      name: internal
+
+---
+# ══════════════════════════════════════════════════════
+# Redis (Cache + Pub/Sub)
+# ══════════════════════════════════════════════════════
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: sentikenya
+  labels:
+    app: sentikenya
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentikenya
+      component: redis
+  template:
+    metadata:
+      labels:
+        app: sentikenya
+        component: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-svc
+  namespace: sentikenya
+spec:
+  selector:
+    app: sentikenya
+    component: redis
+  ports:
+    - port: 6379
+      targetPort: 6379

@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentikenya-inference
+  namespace: sentikenya
+  labels:
+    app: sentikenya
+    component: inference
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sentikenya
+      component: inference
+  template:
+    metadata:
+      labels:
+        app: sentikenya
+        component: inference
+    spec:
+      containers:
+        - name: inference
+          image: sentikenya/inference:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-svc:29092"
+            - name: DATABASE_URL
+              value: "postgresql+asyncpg://postgres:postgres@timescaledb-svc:5432/sentikenya"
+            - name: REDIS_URL
+              value: "redis://redis-svc:6379/0"
+            - name: USE_GPU
+              value: "false"
+            - name: NODE_REGION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name  # each pod gets a unique name as region ID
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          # ── Liveness Probe: restart if unhealthy ──
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # ── Readiness Probe: don't send traffic until model loaded ──
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 5
+          volumeMounts:
+            - name: model-cache
+              mountPath: /app/model_cache
+      volumes:
+        - name: model-cache
+          emptyDir:
+            sizeLimit: 2Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inference-svc
+  namespace: sentikenya
+  labels:
+    app: sentikenya
+    component: inference
+spec:
+  type: ClusterIP
+  selector:
+    app: sentikenya
+    component: inference
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
