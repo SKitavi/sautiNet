@@ -600,6 +600,7 @@ class CustomModelTrainer:
                     "count": len(lang_mask),
                 }
 
+
         return {
             "accuracy": overall_acc,
             "f1_macro": overall_f1,
@@ -611,6 +612,7 @@ class CustomModelTrainer:
             "confusion_matrix": cm.tolist(),
             "per_language": lang_metrics,
         }
+
 
     def train(self):
         """
@@ -628,6 +630,7 @@ class CustomModelTrainer:
         print("  SentiKenya Custom Model Training")
         print("  Architecture: BiLSTM + Self-Attention")
         print("=" * 65)
+
 
         # ── Step 1: Data ──
         texts, labels, languages = self.load_data()
