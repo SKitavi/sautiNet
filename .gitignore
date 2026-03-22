@@ -1,0 +1,27 @@
+# Editor
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# ML model weights & cache
+model_cache/
+*.bin
+*.safetensors
+*.pt
+*.pth
+
+# Data / logs
+*.log
+*.csv
+
+# OS
+.DS_Store
