@@ -6,6 +6,7 @@ How to Run it
 
 
 Terminal 1 — Backend:
+
 cd sautiNet/sautinet-ml-backend
 
 python -m venv venv && source venv/bin/activate
