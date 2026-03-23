@@ -194,10 +194,13 @@ class IngestionManager:
             except Exception as e:
                 logger.warning(f"[ingestion] Kafka publish failed: {e}, trying direct")
 
-        # Route 2: Direct processing
+        # Route 2: Direct processing (supports both sync and async processors)
         if self.direct_processor:
             try:
                 result = self.direct_processor(post)
+                # If the processor is async, await the coroutine
+                if asyncio.iscoroutine(result):
+                    result = await result
                 self.metrics["total_processed"] += 1
 
                 # Log high-engagement or strong-sentiment posts
