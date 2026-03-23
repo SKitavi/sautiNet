@@ -106,6 +106,26 @@ async def lifespan(app: FastAPI):
     worker_task = asyncio.create_task(worker.start())
 
     # ── Start social media ingestion (Reddit) ──
+    # FIX: The old direct_processor=pipeline.process_post bypassed the NLPWorker,
+    # meaning ingested posts were analyzed but NEVER broadcast to WebSocket clients
+    # and NEVER aggregated into county/trending data. We now wrap the processor
+    # to also aggregate + broadcast results through the worker's infrastructure.
+    async def _ingestion_processor(raw_post):
+        """Process a post AND broadcast + aggregate results."""
+        processed = pipeline.process_post(raw_post)
+        # Aggregate into worker's county/topic stats
+        worker.aggregator.add_post(processed)
+        worker._processed_count += 1
+        # Broadcast to WebSocket clients
+        try:
+            await worker._broadcast_post(processed)
+            await worker._check_alerts(processed)
+            if worker._processed_count % 10 == 0:
+                await worker._broadcast_stats()
+        except Exception as e:
+            logger.warning(f"Broadcast failed for ingested post: {e}")
+        return processed
+
     if settings.ENABLE_INGESTION:
         ingestion = IngestionManager(
             reddit_client_id=settings.REDDIT_CLIENT_ID,
@@ -114,7 +134,7 @@ async def lifespan(app: FastAPI):
             reddit_poll_interval=settings.REDDIT_POLL_INTERVAL,
             kafka_service=kafka,
             kafka_topic=settings.KAFKA_TOPIC_RAW_POSTS,
-            direct_processor=pipeline.process_post,
+            direct_processor=_ingestion_processor,
         )
         await ingestion.start()
         logger.info(f"Ingestion active: {', '.join(ingestion.active_connectors) or 'starting...'}")
