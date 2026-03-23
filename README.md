@@ -2,6 +2,7 @@
 Decentralized Sentiment Analysis for Kenyan Social Media Data
 
 How to Run it
+
 Terminal 1 — Backend:
 bashcd sautiNet/sautinet-ml-backend
 python -m venv venv && source venv/bin/activate
