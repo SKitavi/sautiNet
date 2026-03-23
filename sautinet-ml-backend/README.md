@@ -1,4 +1,4 @@
-# 🇰🇪 SentiKenya
+# 🇰🇪 SautiNet
 
 **Decentralized Sentiment Analysis for Kenyan Social Media**
 
