@@ -9,20 +9,16 @@ A distributed NLP platform that analyzes political sentiment and public opinion 
 ## Screenshots
 
 ### Dashboard
-<!-- Replace the line below with your screenshot: ![Dashboard](docs/screenshots/dashboard.png) -->
-> 📸 _Screenshot coming soon — Dashboard: KPIs, sentiment distribution, trending topics_
-
-### Text Analysis
-<!-- Replace the line below with your screenshot: ![Analyze](docs/screenshots/analyze.png) -->
-> 📸 _Screenshot coming soon — Analyze Text: sentiment gauge, entity table, Sheng detection_
+> ![Dashboard](docs/screenshots/dashboard.png)
+> ![Dashboard](docs/screenshots/dashboard2.png)
 
 ### County Sentiment
-<!-- Replace the line below with your screenshot: ![Counties](docs/screenshots/counties.png) -->
-> 📸 _Screenshot coming soon — County Sentiment: bar chart across all 47 counties_
+> ![Counties](docs/screenshots/counties.png)
+> ![Counties](docs/screenshots/counties2.png)
+
 
 ### Live Feed
-<!-- Replace the line below with your screenshot: ![Live Feed](docs/screenshots/live_feed.png) -->
-> 📸 _Screenshot coming soon — Live Feed: real-time WebSocket stream_
+> ![Live Feed](docs/screenshots/live_feed.png)
 
 ---
 
