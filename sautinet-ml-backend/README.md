@@ -4,12 +4,13 @@
 
 A distributed NLP platform that analyzes political sentiment and public opinion across Kenyan social media in real-time, supporting **English**, **Swahili**, and **Sheng**.
 
+
 ## Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                    DATA INGESTION LAYER                       │
-│  Twitter/X API │ Facebook Graph │ TikTok │ Web Scrapers      │
+│                    DATA INGESTION LAYER                      │
+│ Reddit | Twitter │ Facebook Graph │ TikTok │ Web Scrapers    │
 └──────────────────────────┬───────────────────────────────────┘
                            ▼
 ┌──────────────────────────────────────────────────────────────┐
