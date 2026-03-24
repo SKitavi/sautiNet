@@ -21,7 +21,56 @@ A distributed NLP platform that analyzes political sentiment and public opinion 
 > ![Live Feed](docs/screenshots/live_feed.png)
 
 ---
+## Quick Start
 
+### Prerequisites
+- Python 3.9+
+- ~2GB disk space (for transformer model download on first run)
+
+### 1. Fix PATH (macOS)
+```bash
+echo 'export PATH="$PATH:/Users/$USER/Library/Python/3.9/bin"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+### 2. Backend
+
+```bash
+cd sautinet-ml-backend
+pip3 install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Wait for `SentiKenya is LIVE` — first run downloads the HuggingFace model (~1–2 GB).
+
+### 3. Frontend
+
+```bash
+cd sautinet-frontend
+pip3 install -r requirements.txt
+streamlit run app.py
+```
+
+Open **http://localhost:8501**
+
+### 4. Production Cluster (Docker)
+
+```bash
+cd sautinet-ml-backend
+docker-compose up -d
+```
+
+Starts 3 nodes + Kafka + TimescaleDB + Redis + IPFS + Kafka UI.
+
+| Service | URL |
+|---------|-----|
+| Nairobi Node | http://localhost:8000 |
+| Mombasa Node | http://localhost:8001 |
+| Kisumu Node | http://localhost:8002 |
+| Kafka UI | http://localhost:8090 |
+| IPFS Gateway | http://localhost:8080 |
+
+---
 ## Architecture
 
 ```
@@ -157,57 +206,6 @@ Input → Embedding(128) → BiLSTM(64×2 layers) → Self-Attention → FC(64) 
 | Storage | TimescaleDB, IPFS, Redis |
 | Frontend | Streamlit, Plotly |
 | Deployment | Docker, docker-compose |
-
----
-
-## Quick Start
-
-### Prerequisites
-- Python 3.9+
-- ~2GB disk space (for transformer model download on first run)
-
-### 1. Fix PATH (macOS)
-```bash
-echo 'export PATH="$PATH:/Users/$USER/Library/Python/3.9/bin"' >> ~/.zshrc
-source ~/.zshrc
-```
-
-### 2. Backend
-
-```bash
-cd sautinet-ml-backend
-pip3 install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-Wait for `SentiKenya is LIVE` — first run downloads the HuggingFace model (~1–2 GB).
-
-### 3. Frontend
-
-```bash
-cd sautinet-frontend
-pip3 install -r requirements.txt
-streamlit run app.py
-```
-
-Open **http://localhost:8501**
-
-### 4. Production Cluster (Docker)
-
-```bash
-cd sautinet-ml-backend
-docker-compose up -d
-```
-
-Starts 3 nodes + Kafka + TimescaleDB + Redis + IPFS + Kafka UI.
-
-| Service | URL |
-|---------|-----|
-| Nairobi Node | http://localhost:8000 |
-| Mombasa Node | http://localhost:8001 |
-| Kisumu Node | http://localhost:8002 |
-| Kafka UI | http://localhost:8090 |
-| IPFS Gateway | http://localhost:8080 |
 
 ---
 
