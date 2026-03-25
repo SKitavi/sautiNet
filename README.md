@@ -4,7 +4,7 @@
 
 A distributed NLP platform that analyzes political sentiment and public opinion across Kenyan social media in real-time, supporting **English**, **Swahili**, and **Sheng**.
 
-![Demo](https://www.loom.com/share/d4ada453c04149b3bc60db0080b21c94)
+[Demo](https://www.loom.com/share/d4ada453c04149b3bc60db0080b21c94)
 
 ---
 
