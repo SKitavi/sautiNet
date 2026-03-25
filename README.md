@@ -2,7 +2,9 @@
 
 **Decentralized Sentiment Analysis for Kenyan Social Media**
 
-A distributed NLP platform that analyzes political sentiment and public opinion across Kenyan social media in real-time, supporting **English**, **Swahili**, and **Sheng**. Built as a distributed ML class project.
+A distributed NLP platform that analyzes political sentiment and public opinion across Kenyan social media in real-time, supporting **English**, **Swahili**, and **Sheng**.
+
+![Demo](https://www.loom.com/share/d4ada453c04149b3bc60db0080b21c94)
 
 ---
 
@@ -252,12 +254,6 @@ curl -X POST http://localhost:8000/api/v1/analyze \
 - **Merkle Trees** — batch verification across nodes
 - **3 Processing Nodes** — Nairobi, Mombasa, Kisumu
 - **Consensus** — multi-node sentiment scoring verification
-
----
-
-## Team
-
-Built for a Distributed ML class project.
 
 ---
 
